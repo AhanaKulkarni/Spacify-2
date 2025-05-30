@@ -289,25 +289,25 @@ export function PropertiesPanel() {
         </div>
         
         <div className="space-y-3">
-          {currentProject.moodboard.length > 0 && (
+            {Array.isArray((currentProject as any).moodboard) && (currentProject as any).moodboard.length > 0 && (
             <div className="grid grid-cols-2 gap-2">
-              {currentProject.moodboard.map((imageUrl: string, index: number) => (
-                <div key={index} className="relative group">
-                  <img
-                    src={imageUrl}
-                    alt={`Moodboard ${index + 1}`}
-                    className="w-full h-20 object-cover rounded-lg"
-                  />
-                  <button
-                    onClick={() => removeMoodboardImage(imageUrl)}
-                    className="absolute top-1 right-1 w-5 h-5 bg-red-500 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center"
-                  >
-                    <Trash2 className="h-3 w-3" />
-                  </button>
-                </div>
+              {(currentProject as any).moodboard.map((imageUrl: string, index: number) => (
+              <div key={index} className="relative group">
+                <img
+                src={imageUrl}
+                alt={`Moodboard ${index + 1}`}
+                className="w-full h-20 object-cover rounded-lg"
+                />
+                <button
+                onClick={() => removeMoodboardImage(imageUrl)}
+                className="absolute top-1 right-1 w-5 h-5 bg-red-500 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center"
+                >
+                <Trash2 className="h-3 w-3" />
+                </button>
+              </div>
               ))}
             </div>
-          )}
+            )}
           
           <Button
             onClick={handleAddMoodboardImage}
@@ -329,9 +329,9 @@ export function PropertiesPanel() {
         
         <div className="space-y-3">
           {/* Existing Notes */}
-          {currentProject.notes.length > 0 && (
+          {Array.isArray((currentProject as any).notes) && (currentProject as any).notes.length > 0 && (
             <div className="space-y-2 max-h-40 overflow-y-auto">
-              {currentProject.notes.map((note: {
+              {(currentProject as any).notes.map((note: {
                 id: string;
                 content: string;
                 type: 'public' | 'private';
