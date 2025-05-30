@@ -1,0 +1,26 @@
+# Node.js
+node_modules/
+dist/
+.env
+.DS_Store
+
+# Replit-specific
+.replit
+*.replit
+*.tar.gz
+
+# Vite-specific (optional, but safe)
+.vite/
+
+# Build output
+server/public/
+
+# System files
+*.log
+
+# Optional: If using TypeScript
+*.tsbuildinfo
+
+# Vercel/Netlify (optional)
+.vercel/
+.netlify/

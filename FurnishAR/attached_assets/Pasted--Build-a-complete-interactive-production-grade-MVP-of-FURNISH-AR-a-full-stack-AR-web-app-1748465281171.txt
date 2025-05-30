@@ -1,0 +1,318 @@
+
+
+
+
+Build a complete interactive production-grade MVP of **FURNISH-AR**, a full-stack AR web application tailored exclusively for **interior designers and interior design firms**. It must work seamlessly across desktop and mobile, support 2D+3D room building, model placements, live AR visualization, editable nodes, Vastu, collaboration, and moodboards. Use placeholder data and in-browser storage where needed. Backend logic for subscriptions and model uploads should be **simulated** in the frontend. And I will be editing this app's AR portion in VS code further, so make sure whatever you create works perfectly well in VSCODE.
+
+---
+
+## 🧠 CORE PURPOSE : 
+
+> FURNISH-AR is not for general users. It is a **power tool** for interior designers. It simplifies client interactions and room design with real-time 3D + AR visualization, editable 2D node-based rooms, model swaps, moodboards, and collaborative tools — **without needing CAD knowledge**.
+
+It must allow a designer to:
+
+1. Create scaled rooms based on dimensions
+2. Edit 2D shape of room via draggable node points
+3. View the updated room in 3D and AR
+4. Place furniture from a categorized catalog
+5. Upload custom GLTF/GLB models (simulate limit logic)
+6. Collaborate with clients via view-only or edit-enabled links
+7. Toggle **Vastu mode** to get directional-based tips
+8. Build moodboards, add notes, export invoices
+9. Simulate subscription limits (3 uploads on free, 25 on pro, unlimited on studio)
+10. Work offline without server reliance for MVP
+
+---
+
+## 🌐 TECH REQUIREMENTS
+
+* Frontend: React + React Three Fiber for 3D, Zustand/Context for state
+* AR: `@react-three/xr`, `model-viewer` or WebXR
+* 2D Room Editor: Canvas-based view with draggable polygon nodes
+* File Upload: GLTF/GLB drag & drop
+* Persistence: Use `localStorage` or dummy JSON to simulate account data
+* UI: Clean, modular, mobile-responsive layout
+
+---
+
+## 🖥️ DASHBOARD MODULE
+
+* Upon login, user sees:
+
+  * ✅ Active Projects (click to enter)
+  * 🗂 Archived Projects
+  * ➕ Create New Project
+  * 🔍 Filter by Client Name, Room Type, Status
+  * ⚙️ Account Settings (Plan, Upload Limit)
+  * 🌙 Light/Dark toggle
+
+* Design language:
+
+  * **White background**, modern sans-serif, soft rounded cards
+  * Accent colors: **Midnight Blue + white + professional colours (for a designer)** 
+  * Dashboard has subtle glassmorphism, shadows, responsive grid
+
+---
+
+## 🧩 NEW PROJECT FLOW
+
+When “Create New Project” is clicked:
+
+* Ask for:
+
+  * Client Name
+  * Room Type (dropdown: Bedroom, Living, Kitchen, Pooja, etc.)
+  * Dimensions (Length, Width, Height)
+  * Prompts:
+
+    * Children in home? Y/N
+    * Pets? Y/N
+    * Senior citizens? Y/N
+
+* Generate a **scaled 3D room box** based on inputs
+
+* Place default furniture models (optional toggle)
+
+* Save all metadata locally under project ID
+
+---
+
+## ✏️ 2D ROOM EDITOR (CRITICAL)
+
+* Top-down **2D polygon view of room**
+* Show **draggable corner nodes**
+* Designer can:
+
+  * Add, remove or drag corners to edit the room shape 
+  * Create **L-shapes, T-shapes**, or curved walls
+  * Add windows/doors/cupboards/any other futnirute (via markers) 
+* Real-time sync with 3D view
+
+---
+
+## 🧱 3D ROOM VIEW (LIVE SYNCED)
+
+* Switch between **2D and 3D views (toggle for switching between 2D MODE & 3D MODE) 
+* Built using **React Three Fiber**
+* Room box scaled with walls, floor, and ceiling
+* Cameras:
+
+  * Orbit controls for 3D
+  * Pan/zoom for 2D
+
+---
+
+## 🪑 FURNITURE SYSTEM
+
+* 7 Categories:
+
+  * Beds, Sofas, Chairs, Tables, Wall Decor, Dining, Cutlery
+
+* Each has 5 dummy GLB/GLTF models
+
+* Show model thumbnails with name
+
+* Allow drag-and-drop into room or auto-place in center and if the designer places any model in 2D, it should be reflected as a dummy (default) model in the 3D space as well.  
+
+* Click any furniture to open a **Customization Panel**:
+
+  * Swap model (from same category)
+  * Change color (5 options)
+  * Change texture (wood, marble, matte, metal, fabric)
+
+* Simulate interaction with **transform controls** (move/rotate/scale)
+
+* Furniture snapping to floor & walls
+
+---
+
+## 🌈 TEXTURES & COLORS
+
+* Include:
+
+  * 5 Textures: Wood, Matte White, Glossy Marble, Granite, Fabric
+  * 5 Colors: Warm Grey, Ocean Blue, Burnt Sienna, Ivory, Jet Black
+
+* Applied using material override on model load
+
+---
+
+## 📐 AR MODE
+
+* Toggle "AR View"
+* Opens WebXR-based AR viewer
+* Features:
+
+  * Place room in real-world environment
+  * Interact with furniture
+  * Click item to edit in AR mode - again the whole panel will open up and will allow the editor to edit in real time  
+  * Device compass auto-aligns room (use window\.orientation if possible)
+
+---
+
+## 🧭 VASTU COMPLIANCE PANEL
+
+* Toggle "Enable Vastu Mode"
+
+* Effects:
+
+  * Theme switches to ROYALTY - **Maroon + Gold + every royal touch** 
+  * Add compass overlay to room
+  * Directional tips:
+
+    * Bed headboard: South
+    * Pooja Room: Northeast
+    * Mirror: North Wall only
+  * Panel on right with room-specific do’s/don’ts
+
+* Future: Allow uploading floor plan + API-based suggestions
+
+---
+
+## 🖼 MOODBOARD + NOTES PANEL
+
+* Each project allows:
+
+  * Upload images (.jpg/.png) as inspirations
+  * Add notes tied to:
+
+    * Wall zones
+    * Furniture pieces
+    * Room areas
+
+* Notes can be marked **public/private**
+
+* Notes are timestamped and listed in collapsible drawer
+
+---
+
+## 💾 TEMPLATES
+
+* Button: “Save Room As Template”
+* Load any saved template for new projects
+* Apply modifications after loading
+
+---
+
+## 👥 CLIENT COLLABORATION
+
+* Generate sharable **Client Link** per project
+* View-only by default
+* Switch: Enable client edits (simulated)
+* In client view:
+
+  * Can suggest changes via comment pins
+  * Can favorite furniture
+  * Moodboard view allowed
+
+---
+
+## 🧾 FINALIZATION + INVOICE
+
+* Button: “Finalize Project”
+
+  * Shows list of all placed items
+  * Grouped by category
+  * Model name, SKU (dummy), material, color, size
+
+* Button: “Generate Invoice” (PDF)
+
+  * Export dummy pricing and summary
+  * Attach client name and date
+
+---
+
+## 📦 MODEL LIBRARY & UPLOADS
+
+* Simulate default library of 20 models
+
+* Designer can upload:
+
+  * `.glb` or `.gltf` files
+  * Assign category
+  * See uploaded models in panel
+
+* Upload limit based on plan:
+
+  * Basic: 100 uploads/month 
+  * Pro: 400 uploads/month 
+  * Studio: Unlimited
+
+* Show warning modal if exceeded → prompt upgrade
+
+---
+
+## 💳 SUBSCRIPTION LOGIC
+
+* Simulate 3 tiers:
+
+  * **Basic (\$9/month)**: 
+
+    * 150 model uploads/month   
+    * Unlimited projects
+    * Collaboration ON
+    * Invoice export    
+* Moodboard allowed 
+
+  * **Pro (\$29/month)**: 
+
+    * 400 uploads 
+    * Unlimited projects
+    * Collaboration ON
+    * Invoice export
+
+  * **Enterprise (\$39/month/Negotiable)**: 
+
+    * Unlimited uploads
+    * Offline mode
+    * White-label branding
+    * Priority support
+
+* Track uploads per user
+
+* Prompt upgrade if exceeded
+
+---
+
+## 🔥STRETCH GOALS 
+
+* [ ] **Multi-user Design Sessions**:
+
+  * WebSocket or dummy sync for team co-design
+
+* [ ] **AR Preview History**:
+
+  * Show timestamped preview thumbnails
+
+* [ ] **AI Moodboard Parser**:
+
+  * Detect objects/colors from uploaded moodboard images
+
+---
+
+## 📁 FILE STRUCTURE EXPECTATION - can change and can use you own  
+
+* `App.jsx`: Core router
+* `Dashboard.jsx`: Project listing
+* `NewProjectForm.jsx`: Project input
+* `Room2DView.jsx`: Editable nodes, canvas
+* `Room3DView.jsx`: Three.js live room
+* `FurniturePanel.jsx`: Model selector + customizer
+* `ARViewer.jsx`: WebXR AR mode
+* `VastuPanel.jsx`: Vastu rules and compass
+* `Moodboard.jsx`: Upload & view references
+* `NotesDrawer.jsx`: Notes/comments
+* `InvoicePage.jsx`: Final invoice view
+* `SubscriptionModal.jsx`: Plan prompts
+
+---
+
+
+
+👉 **DO NOT scaffold empty files. Build everything end-to-end.**
+👉 Use placeholder assets and state. Treat this as a working MVP for real-world demos.
+👉 Focus on functional interactivity — especially for the room dimension → editable 2D → live 3D sync → AR → customization pipeline.
+👉 Prioritize designer’s POV — make it intuitive, clean, responsive.
+
+ 

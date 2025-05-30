@@ -1,0 +1,216 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: 210 11% 98%; /* #F5F7FA */
+  --foreground: 210 40% 8%; /* #0F172A */
+  --muted: 210 40% 96%; /* #F1F5F9 */
+  --muted-foreground: 215 16% 47%; /* #64748B */
+  --popover: 0 0% 100%;
+  --popover-foreground: 210 40% 8%;
+  --card: 0 0% 100%;
+  --card-foreground: 210 40% 8%;
+  --border: 215 28% 88%; /* #CBD5E1 */
+  --input: 215 28% 88%;
+  --primary: 207 90% 54%; /* #3B82F6 */
+  --primary-foreground: 0 0% 100%;
+  --secondary: 210 40% 96%;
+  --secondary-foreground: 215 25% 27%;
+  --accent: 210 40% 96%;
+  --accent-foreground: 215 25% 27%;
+  --destructive: 0 84% 60%;
+  --destructive-foreground: 0 0% 98%;
+  --ring: 215 25% 27%;
+  --radius: 0.75rem;
+
+  /* Custom FURNISH-AR colors */
+  --midnight-50: 210 40% 98%;
+  --midnight-100: 210 40% 96%;
+  --midnight-200: 214 32% 91%;
+  --midnight-300: 213 27% 84%;
+  --midnight-400: 215 20% 65%;
+  --midnight-500: 215 16% 47%;
+  --midnight-600: 215 19% 35%;
+  --midnight-700: 215 25% 27%;
+  --midnight-800: 217 33% 17%;
+  --midnight-900: 222 84% 5%;
+
+  /* Vastu royal colors */
+  --royal-maroon: 11 68% 28%;
+  --royal-gold: 43 96% 56%;
+}
+
+.dark {
+  --background: 222 84% 5%;
+  --foreground: 210 40% 98%;
+  --muted: 217 33% 17%;
+  --muted-foreground: 215 20% 65%;
+  --popover: 222 84% 5%;
+  --popover-foreground: 210 40% 98%;
+  --card: 217 33% 17%;
+  --card-foreground: 210 40% 98%;
+  --border: 215 25% 27%;
+  --input: 215 25% 27%;
+  --primary: 207 90% 54%;
+  --primary-foreground: 0 0% 100%;
+  --secondary: 217 33% 17%;
+  --secondary-foreground: 210 40% 98%;
+  --accent: 217 33% 17%;
+  --accent-foreground: 210 40% 98%;
+  --destructive: 0 63% 31%;
+  --destructive-foreground: 210 40% 98%;
+  --ring: 215 20% 65%;
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply font-sans antialiased min-h-screen;
+    background: linear-gradient(to bottom right, hsl(var(--midnight-50)), hsl(210 40% 98%));
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  }
+
+  .dark body {
+    background: linear-gradient(to bottom right, hsl(var(--midnight-900)), hsl(var(--midnight-800)));
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-semibold;
+  }
+}
+
+@layer components {
+  .glassmorphism {
+    background: rgba(255, 255, 255, 0.25);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+  }
+
+  .dark .glassmorphism {
+    background: rgba(30, 41, 59, 0.25);
+    border: 1px solid rgba(100, 116, 139, 0.18);
+  }
+
+  .vastu-mode {
+    background: linear-gradient(135deg, hsl(var(--royal-maroon)) 0%, #991B1B 100%);
+  }
+
+  .ar-grid {
+    background-image: 
+      linear-gradient(rgba(59, 130, 246, 0.1) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(59, 130, 246, 0.1) 1px, transparent 1px);
+    background-size: 20px 20px;
+  }
+
+  .furniture-item {
+    @apply transition-all duration-200 cursor-pointer;
+  }
+
+  .furniture-item:hover {
+    @apply -translate-y-0.5 shadow-lg;
+  }
+
+  .room-node {
+    @apply cursor-pointer transition-all duration-200;
+  }
+
+  .room-node:hover {
+    @apply scale-110;
+  }
+
+  .view-toggle-btn {
+    @apply px-4 py-2 text-sm font-medium rounded-md transition-all duration-200;
+  }
+
+  .view-toggle-btn.active {
+    @apply bg-primary text-primary-foreground;
+  }
+
+  .view-toggle-btn:not(.active) {
+    @apply text-muted-foreground hover:text-primary;
+  }
+}
+
+@layer utilities {
+  .text-midnight-50 { color: hsl(var(--midnight-50)); }
+  .text-midnight-100 { color: hsl(var(--midnight-100)); }
+  .text-midnight-200 { color: hsl(var(--midnight-200)); }
+  .text-midnight-300 { color: hsl(var(--midnight-300)); }
+  .text-midnight-400 { color: hsl(var(--midnight-400)); }
+  .text-midnight-500 { color: hsl(var(--midnight-500)); }
+  .text-midnight-600 { color: hsl(var(--midnight-600)); }
+  .text-midnight-700 { color: hsl(var(--midnight-700)); }
+  .text-midnight-800 { color: hsl(var(--midnight-800)); }
+  .text-midnight-900 { color: hsl(var(--midnight-900)); }
+
+  .bg-midnight-50 { background-color: hsl(var(--midnight-50)); }
+  .bg-midnight-100 { background-color: hsl(var(--midnight-100)); }
+  .bg-midnight-200 { background-color: hsl(var(--midnight-200)); }
+  .bg-midnight-300 { background-color: hsl(var(--midnight-300)); }
+  .bg-midnight-400 { background-color: hsl(var(--midnight-400)); }
+  .bg-midnight-500 { background-color: hsl(var(--midnight-500)); }
+  .bg-midnight-600 { background-color: hsl(var(--midnight-600)); }
+  .bg-midnight-700 { background-color: hsl(var(--midnight-700)); }
+  .bg-midnight-800 { background-color: hsl(var(--midnight-800)); }
+  .bg-midnight-900 { background-color: hsl(var(--midnight-900)); }
+
+  .border-midnight-200 { border-color: hsl(var(--midnight-200)); }
+  .border-midnight-300 { border-color: hsl(var(--midnight-300)); }
+  .border-midnight-600 { border-color: hsl(var(--midnight-600)); }
+  .border-midnight-700 { border-color: hsl(var(--midnight-700)); }
+
+  .text-royal-maroon { color: hsl(var(--royal-maroon)); }
+  .text-royal-gold { color: hsl(var(--royal-gold)); }
+  .bg-royal-maroon { background-color: hsl(var(--royal-maroon)); }
+  .bg-royal-gold { background-color: hsl(var(--royal-gold)); }
+}
+
+/* Animation keyframes */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from { transform: translateY(20px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+@keyframes pulse-soft {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+.animate-slide-up {
+  animation: slideUp 0.3s ease-out;
+}
+
+.animate-pulse-soft {
+  animation: pulse-soft 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: hsl(var(--muted));
+}
+
+::-webkit-scrollbar-thumb {
+  background: hsl(var(--muted-foreground));
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: hsl(var(--primary));
+}
