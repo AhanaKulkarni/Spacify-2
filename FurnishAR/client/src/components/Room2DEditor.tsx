@@ -263,7 +263,9 @@ export function Room2DEditor() {
         {/* Dimensions Display */}
         <div className="absolute bottom-4 left-4 bg-white dark:bg-midnight-700 px-3 py-2 rounded-lg shadow-sm border border-midnight-200 dark:border-midnight-600">
           <p className="text-sm text-midnight-600 dark:text-midnight-300">
-            {currentProject?.dimensions.length}' × {currentProject?.dimensions.width}'
+            {typeof currentProject?.dimensions === 'object' && currentProject?.dimensions !== null && 'length' in currentProject.dimensions && 'width' in currentProject.dimensions
+              ? `${(currentProject.dimensions as { length: number; width: number }).length}' × ${(currentProject.dimensions as { length: number; width: number }).width}'`
+              : '--'}
           </p>
         </div>
       </div>
