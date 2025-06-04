@@ -1,12 +1,12 @@
-
-import React, { Suspense, useRef, useEffect, useState } from 'react';
+import React, { Suspense, useRef, useEffect, useState, MutableRefObject } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
-import { OrbitControls, Text, Box } from '@react-three/drei';
-import * as THREE from 'three'
+import { OrbitControls, useGLTF, TransformControls } from '@react-three/drei';
+import * as THREE from 'three';
 import { useAppStore } from '@/lib/store';
+import { saveProjectToLocal, exportProjectAsJSON } from '@/lib/projectUtils';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { RotateCcw, Move, RotateCw, Maximize } from 'lucide-react';
+import { RotateCcw, Move, RotateCw, Maximize, Save, Download } from 'lucide-react';
 
 // Error Boundary Component
 class WebGLErrorBoundary extends React.Component<
@@ -35,6 +35,15 @@ class WebGLErrorBoundary extends React.Component<
   }
 }
 
+// Fallback component for WebGL errors
+function WebGLFallback(): JSX.Element {
+  return (
+    <div className="flex items-center justify-center h-full text-red-600">
+      <p>WebGL context lost or not supported. Please reload the page.</p>
+    </div>
+  );
+}
+
 // Context loss handler
 function useWebGLContextLoss() {
   const { gl } = useThree();
@@ -42,7 +51,7 @@ function useWebGLContextLoss() {
 
   useEffect(() => {
     const canvas = gl.domElement;
-    
+
     const handleContextLost = (event: Event) => {
       event.preventDefault();
       setContextLost(true);
@@ -69,7 +78,7 @@ function useWebGLContextLoss() {
 // Lighting component with error handling
 function Lighting() {
   const contextLost = useWebGLContextLoss();
-  
+
   if (contextLost) return null;
 
   return (
@@ -99,10 +108,10 @@ function Room() {
   try {
     // Create room shape from 2D points
     const shape = new THREE.Shape();
-    
+
     // Scale down the 2D coordinates for 3D scene
     const scaleFactor = 0.02;
-    
+
     shape.moveTo(roomShape[0].x * scaleFactor, roomShape[0].y * scaleFactor);
     for (let i = 1; i < roomShape.length; i++) {
       shape.lineTo(roomShape[i].x * scaleFactor, roomShape[i].y * scaleFactor);
@@ -119,19 +128,15 @@ function Room() {
         {/* Floor */}
         <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0, 0]} receiveShadow>
           <shapeGeometry args={[shape]} />
-          <meshStandardMaterial 
-            color="#f8f8f8" 
-            transparent 
-            opacity={0.8}
-          />
+          <meshStandardMaterial color="#f8f8f8" transparent opacity={0.8} />
         </mesh>
-        
+
         {/* Walls */}
         <mesh position={[0, 0.25, 0]} castShadow receiveShadow>
           <extrudeGeometry args={[shape, extrudeSettings]} />
-          <meshStandardMaterial 
-            color="#e2e8f0" 
-            transparent 
+          <meshStandardMaterial
+            color="#e2e8f0"
+            transparent
             opacity={0.3}
             side={THREE.DoubleSide}
           />
@@ -144,111 +149,165 @@ function Room() {
   }
 }
 
-// Furniture piece component
-function FurniturePiece({ 
-  position, 
-  isSelected, 
-  onClick 
-}: { 
-  position: [number, number, number]; 
-  isSelected: boolean; 
-  onClick: () => void; 
-}) {
-  const meshRef = useRef<THREE.Mesh>(null);
-  const contextLost = useWebGLContextLoss();
+// Furniture model component
+const FurnitureModel = React.forwardRef<THREE.Object3D, {
+  modelPath: string;
+  position: [number, number, number];
+  rotation: [number, number, number];
+  scale: [number, number, number];
+  isSelected: boolean;
+  onClick: () => void;
+}>(
+  ({ modelPath, position, rotation, scale, isSelected, onClick }, ref) => {
+    const group = useRef<THREE.Group>(null!);
+    const { scene } = useGLTF(modelPath) as { scene: THREE.Group };
 
-  useFrame(() => {
-    if (meshRef.current && isSelected && !contextLost) {
-      meshRef.current.rotation.y += 0.01;
-    }
-  });
+    useFrame(() => {
+      if (group.current && isSelected) {
+        group.current.rotation.y += 0.01;
+      }
+    });
 
-  if (contextLost) return null;
+    // Forward the ref to the group
+    useEffect(() => {
+      if (ref && typeof ref !== "function") {
+        (ref as React.MutableRefObject<THREE.Object3D | null>).current = group.current;
+      }
+    }, [ref]);
 
-  return (
-    <mesh
-      ref={meshRef}
-      position={position}
-      onClick={onClick}
-      castShadow
-      receiveShadow
-    >
-      <boxGeometry args={[0.5, 0.5, 0.5]} />
-      <meshStandardMaterial 
-        color={isSelected ? "#3b82f6" : "#8b5cf6"} 
-        transparent 
-        opacity={0.8}
+    return (
+      <primitive
+        ref={group}
+        object={scene}
+        position={position}
+        rotation={rotation}
+        scale={scale}
+        onClick={onClick}
       />
-    </mesh>
-  );
-}
+    );
+  }
+);
+FurnitureModel.displayName = "FurnitureModel";
 
-// Fallback component for when WebGL fails
-function WebGLFallback() {
-  return (
-    <div className="flex items-center justify-center h-full bg-gray-100 dark:bg-gray-800 rounded-lg">
-      <div className="text-center p-8">
-        <div className="text-4xl mb-4">🎨</div>
-        <h3 className="text-lg font-semibold text-gray-700 dark:text-gray-300 mb-2">
-          3D View Unavailable
-        </h3>
-        <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
-          WebGL context was lost. This can happen due to GPU issues or browser limitations.
-        </p>
-        <Button 
-          onClick={() => window.location.reload()} 
-          variant="outline" 
-          size="sm"
-        >
-          <RotateCcw className="w-4 h-4 mr-2" />
-          Reload Page
-        </Button>
-      </div>
-    </div>
-  );
-}
-
-// Main 3D Scene component
+// Scene3D component (fixed and properly closed)
 function Scene3D() {
-  const { placedFurniture, selectedFurniture, setSelectedFurniture } = useAppStore();
+  const { placedFurniture, selectedFurniture, setSelectedFurniture, transformMode } = useAppStore();
+  const transformRef = useRef<THREE.Object3D>(null);
+  const selectedObjectRef = useRef<THREE.Object3D>(null);
+
+  // TransformControls integration
+  useEffect(() => {
+    if (!transformRef.current) return;
+
+    // Access the actual TransformControls instance
+    const controls = (transformRef.current as any)?.controls || (transformRef.current as any);
+
+    const callback = (event: any) => {
+      if (selectedFurniture && selectedObjectRef.current) {
+        // Update furniture position/rotation/scale in store
+        const updatedFurniture = { ...selectedFurniture };
+
+        if (transformMode === 'move') {
+          updatedFurniture.position = {
+            x: selectedObjectRef.current.position.x,
+            y: selectedObjectRef.current.position.y,
+            z: selectedObjectRef.current.position.z,
+          };
+        } else if (transformMode === 'rotate') {
+          updatedFurniture.rotation = {
+            x: selectedObjectRef.current.rotation.x,
+            y: selectedObjectRef.current.rotation.y,
+            z: selectedObjectRef.current.rotation.z,
+          };
+        } else if (transformMode === 'scale') {
+          updatedFurniture.scale = {
+            x: selectedObjectRef.current.scale.x,
+            y: selectedObjectRef.current.scale.y,
+            z: selectedObjectRef.current.scale.z,
+          };
+        }
+
+        // Ensure id is always a string and modelId is always a number
+        if (updatedFurniture.id) {
+          setSelectedFurniture({
+            ...updatedFurniture,
+            id: String(updatedFurniture.id),
+            modelId: updatedFurniture.modelId ?? 0, // fallback to 0 or another valid default
+            position: updatedFurniture.position ?? { x: 0, y: 0, z: 0 },
+            rotation: updatedFurniture.rotation ?? { x: 0, y: 0, z: 0 },
+            scale: updatedFurniture.scale ?? { x: 1, y: 1, z: 1 },
+            color: updatedFurniture.color ?? "",
+            texture: updatedFurniture.texture ?? "",
+          });
+        }
+      }
+    };
+
+    if (controls && typeof controls.addEventListener === 'function') {
+      controls.addEventListener('objectChange', callback);
+    }
+
+    return () => {
+      if (controls && typeof controls.removeEventListener === 'function') {
+        controls.removeEventListener('objectChange', callback);
+      }
+    };
+  }, [transformMode, selectedFurniture, setSelectedFurniture]);
 
   return (
     <>
       <Lighting />
       <Room />
-      
-      {/* Sample furniture pieces */}
-      <FurniturePiece
-        position={[1, 0.25, 1]}
-        isSelected={selectedFurniture?.id === 'furniture1'}
-        onClick={() => setSelectedFurniture(
-                  selectedFurniture?.id === 'furniture1' ? null : {
-                    id: 'furniture1',
-                    modelId: 1,
-                    position: { x: 1, y: 0.25, z: 1 },
-                    rotation: { x: 0, y: 0, z: 0 },
-                    scale: { x: 1, y: 1, z: 1 },
-                    color: "#ffffff", // or any default color
-                    texture: "" // or any default texture string
-                  }
-                )}
-      />
-      
-      <FurniturePiece
-        position={[-1, 0.25, -1]}
-        isSelected={selectedFurniture?.id === 'furniture2'}
-        onClick={() => setSelectedFurniture(
-                  selectedFurniture?.id === 'furniture2' ? null : {
-                    id: 'furniture2',
-                    modelId: 2,
-                    position: { x: -1, y: 0.25, z: -1 },
-                    rotation: { x: 0, y: 0, z: 0 },
-                    scale: { x: 1, y: 1, z: 1 },
-                    color: "#ffffff", // or any default color
-                    texture: "" // or any default texture string
+
+      {placedFurniture.map((item: any) => {
+        const isSelected = selectedFurniture?.id === item.id;
+        return (
+          <React.Fragment key={item.id ?? ''}>
+            <FurnitureModel
+              modelPath={`/models/${item.modelId ?? 0}.glb`}
+              position={[
+                item.position?.x ?? 0,
+                item.position?.y ?? 0,
+                item.position?.z ?? 0,
+              ]}
+              rotation={[
+                item.rotation?.x ?? 0,
+                item.rotation?.y ?? 0,
+                item.rotation?.z ?? 0,
+              ]}
+              scale={[
+                item.scale?.x ?? 1,
+                item.scale?.y ?? 1,
+                item.scale?.z ?? 1,
+              ]}
+              isSelected={isSelected}
+              onClick={() =>
+                setSelectedFurniture(isSelected ? null : item)
+              }
+              ref={isSelected ? selectedObjectRef : undefined}
+            />
+            {isSelected && selectedObjectRef.current && (
+              <TransformControls
+                ref={transformRef as any}
+                object={selectedObjectRef.current}
+                mode={
+                  transformMode === 'move'
+                    ? 'translate'
+                    : transformMode === 'rotate'
+                    ? 'rotate'
+                    : transformMode === 'scale'
+                    ? 'scale'
+                    : undefined
                 }
-              )}
-      />
+                showX={true}
+                showY={true}
+                showZ={true}
+                enabled={!!transformMode}
+              />
+            )}
+          </React.Fragment>
+        );
+      })}
 
       <OrbitControls
         enablePan={true}
@@ -264,7 +323,30 @@ function Scene3D() {
 
 // Main Room3DViewer component
 function Room3DViewer() {
-  const { transformMode, setTransformMode } = useAppStore();
+  const { transformMode, setTransformMode, currentProject } = useAppStore();
+
+  const handleSave = () => {
+    if (currentProject) {
+      // Extract roomShape and placedFurniture for saving
+      saveProjectToLocal({
+        roomShape: currentProject.roomShape,
+        placedFurniture: currentProject.furnitureItems ?? [],
+      });
+    } else {
+      alert('No project to save.');
+    }
+  };
+
+  const handleExport = () => {
+    if (currentProject) {
+      exportProjectAsJSON({
+        roomShape: currentProject.roomShape,
+        placedFurniture: currentProject.furnitureItems ?? [],
+      });
+    } else {
+      alert('No project to export.');
+    }
+  };
 
   return (
     <Card className="glassmorphism rounded-xl border shadow-lg overflow-hidden h-[500px]">
@@ -274,28 +356,50 @@ function Room3DViewer() {
           <h3 className="text-lg font-semibold text-midnight-800 dark:text-white">
             3D Room Viewer
           </h3>
-          
+
           <div className="flex items-center space-x-2">
             <Button
               variant={transformMode === 'move' ? 'default' : 'outline'}
               size="sm"
-              onClick={() => setTransformMode(transformMode === 'move' ? null : 'move')}
+              onClick={() =>
+                setTransformMode(transformMode === 'move' ? null : 'move')
+              }
             >
               <Move className="w-4 h-4" />
             </Button>
             <Button
               variant={transformMode === 'rotate' ? 'default' : 'outline'}
               size="sm"
-              onClick={() => setTransformMode(transformMode === 'rotate' ? null : 'rotate')}
+              onClick={() =>
+                setTransformMode(transformMode === 'rotate' ? null : 'rotate')
+              }
             >
               <RotateCw className="w-4 h-4" />
             </Button>
             <Button
               variant={transformMode === 'scale' ? 'default' : 'outline'}
               size="sm"
-              onClick={() => setTransformMode(transformMode === 'scale' ? null : 'scale')}
+              onClick={() =>
+                setTransformMode(transformMode === 'scale' ? null : 'scale')
+              }
             >
               <Maximize className="w-4 h-4" />
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleSave}
+              className="text-green-600 hover:text-green-800"
+            >
+              <Save className="w-4 h-4" />
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleExport}
+              className="text-purple-600 hover:text-purple-800"
+            >
+              <Download className="w-4 h-4" />
             </Button>
           </div>
         </div>
@@ -312,7 +416,7 @@ function Room3DViewer() {
               alpha: true,
               preserveDrawingBuffer: true,
               failIfMajorPerformanceCaveat: false,
-              powerPreference: "high-performance",
+              powerPreference: 'high-performance',
             }}
             onCreated={({ gl }) => {
               try {

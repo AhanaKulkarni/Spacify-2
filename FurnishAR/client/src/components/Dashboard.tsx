@@ -15,7 +15,15 @@ import {
   Users,
   Package
 } from 'lucide-react';
-import { Project } from '@shared/schema';
+import { Project as SharedProject } from '@shared/schema';
+
+interface Project extends SharedProject {
+  dimensions: {
+    length: number;
+    width: number;
+    height: number;
+  };
+}
 
 interface ProjectStats {
   activeProjects: number;
@@ -50,8 +58,8 @@ export function Dashboard() {
       householdInfo: { children: true, pets: false, seniors: false },
       status: 'active',
       vastuEnabled: false,
-      createdAt: new Date('2024-01-15'),
-      updatedAt: new Date('2024-01-17'),
+      createdAt: new Date('2025-01-15'),
+      updatedAt: new Date('2025-01-17'),
     },
     {
       id: 2,
@@ -128,9 +136,7 @@ export function Dashboard() {
         <CardContent className="p-6 md:p-8">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between">
             <div>
-              <h1 className="text-2xl md:text-3xl font-bold text-midnight-800 dark:text-white mb-2">
-                Welcome back, <span className="text-blue-600">{currentUser?.firstName}</span>
-              </h1>
+            <h1 className="text-2xl md:text-3xl font-bold text-midnight-800 dark:text-white mb-2">Welcome User</h1>
               <p className="text-midnight-600 dark:text-midnight-300">
                 Manage your interior design projects and collaborate with clients
               </p>
@@ -311,7 +317,7 @@ export function Dashboard() {
                 </div>
                 <div className="text-right">
                   <p className="text-xs text-midnight-500 dark:text-midnight-400">
-                    {getTimeAgo(project.updatedAt)}
+                    {project.updatedAt ? getTimeAgo(project.updatedAt) : 'Unknown'}
                   </p>
                 </div>
               </div>

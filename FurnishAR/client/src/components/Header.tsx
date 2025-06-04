@@ -9,12 +9,15 @@ import {
   Home, 
   FolderOpen, 
   Palette, 
-  HelpCircle 
+  HelpCircle,
+  Save,
+  Download
 } from 'lucide-react';
+import { saveProjectToLocal, exportProjectAsJSON } from '@/lib/projectUtils';
 
 export function Header() {
   const { theme, toggleTheme } = useTheme();
-  const { currentUser } = useAppStore();
+  const { currentUser, currentProject } = useAppStore();
 
   const getSubscriptionColor = (subscription: string) => {
     switch (subscription) {
@@ -26,6 +29,32 @@ export function Header() {
         return 'bg-gradient-to-r from-purple-500 to-purple-600';
       default:
         return 'bg-gray-500';
+    }
+  };
+
+  const handleSave = () => {
+    if (currentProject) {
+      // Adapt currentProject to expected shape for saveProjectToLocal
+      const projectData = {
+        roomShape: currentProject.roomShape,
+        placedFurniture: currentProject.furnitureItems || []
+      };
+      saveProjectToLocal(projectData);
+    } else {
+      alert('No project to save.');
+    }
+  };
+
+  const handleExport = () => {
+    if (currentProject) {
+      // Adapt currentProject to expected shape for exportProjectAsJSON
+      const projectData = {
+        roomShape: currentProject.roomShape,
+        placedFurniture: currentProject.furnitureItems || []
+      };
+      exportProjectAsJSON(projectData);
+    } else {
+      alert('No project to export.');
     }
   };
 
@@ -60,6 +89,15 @@ export function Header() {
             <Button variant="ghost" className="text-midnight-700 dark:text-midnight-300 hover:text-blue-600 dark:hover:text-blue-400">
               <HelpCircle className="w-4 h-4 mr-2" />
               Help
+            </Button>
+            {/* Save and Export Buttons */}
+            <Button variant="ghost" className="text-midnight-700 dark:text-midnight-300 hover:text-green-600 dark:hover:text-green-400" onClick={handleSave}>
+              <Save className="w-4 h-4 mr-2" />
+              Save
+            </Button>
+            <Button variant="ghost" className="text-midnight-700 dark:text-midnight-300 hover:text-purple-600 dark:hover:text-purple-400" onClick={handleExport}>
+              <Download className="w-4 h-4 mr-2" />
+              Export
             </Button>
           </nav>
 
