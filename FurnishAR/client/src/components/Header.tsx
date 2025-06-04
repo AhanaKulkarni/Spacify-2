@@ -59,18 +59,21 @@ export function Header() {
   };
 
   return (
-    <header className="glassmorphism border-b border-midnight-200 dark:border-midnight-700 sticky top-0 z-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center h-16">
-          {/* Logo */}
-          <div className="flex items-center space-x-3">
-            <div className="w-10 h-10 bg-gradient-to-r from-midnight-800 to-blue-600 rounded-lg flex items-center justify-center">
-              <span className="text-white font-bold text-lg">FA</span>
-            </div>
-            <span className="text-xl font-semibold text-midnight-800 dark:text-white">
-              FURNISH-AR
-            </span>
-          </div>
+<header className="glassmorphism border-b border-midnight-200 dark:border-midnight-700 sticky top-0 z-50">
+  <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div className="flex justify-between items-center h-16">
+      {/* Logo */}
+      <div className="flex items-center space-x-3">
+        <img
+          src="Spacify.png" // or "/Spacify.jpg" depending on your file
+          alt="Spacify Logo"
+          className="w-10 h-10 rounded-lg object-cover"
+        />
+        <span className="text-xl font-semibold text-midnight-800 dark:text-white">
+          SPACIFY
+        </span>
+      </div>
+
 
           {/* Navigation */}
           <nav className="hidden md:flex space-x-8">
