@@ -65,9 +65,9 @@ export function Header() {
       {/* Logo */}
       <div className="flex items-center space-x-3">
         <img
-          src="Spacify.png" // or "/Spacify.jpg" depending on your file
-          alt="Spacify Logo"
-          className="w-10 h-10 rounded-lg object-cover"
+        src="/Spacify.png"
+        alt="Spacify Logo"
+        className="w-10 h-10 rounded-lg object-cover"
         />
         <span className="text-xl font-semibold text-midnight-800 dark:text-white">
           SPACIFY
